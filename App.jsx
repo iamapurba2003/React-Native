@@ -1,66 +1,104 @@
 import React from "react";
-import { StyleSheet, Text, View, Button, TextInput } from "react-native";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  Button,
+  ToastAndroid,
+  Text,
+} from "react-native";
+import { StatusBar } from "expo-status-bar";
+import GoalInput from "./Components/GoalInput";
+import GoalItem from "./Components/GoalItem";
 
 export default function App() {
-  const [goal, setGoal] = React.useState('')
-  const [goals, setGoals] = React.useState([]); 
-  const goalSubmitHandler = () => {
-    setGoal('')
-    setGoals(prevSnap => {
-      return [...prevSnap, {id: Math.random(), value: goal}]
-    })
-  }
+  const [courseGoals, setCourseGoals] = React.useState([]);
+  const [modalIsVisibleState, setModalIsVisibleState] = React.useState(false);
 
-  const goalDeleteHandler = id => {
-    setGoals(prevSnap => {
-      return prevSnap.filter(goal => goal.id !== id)
-    })
-  }
+  const startAddGoalHandler = () => {
+    setModalIsVisibleState(true);
+  };
 
+  const endAddGoalHandler = () => {
+    setModalIsVisibleState(false);
+  };
+
+  const addGoalHandler = (enteredGoalText) => {
+    setCourseGoals((prevSnap) => {
+      return [
+        ...prevSnap,
+        { text: enteredGoalText, id: Math.random().toString() },
+      ];
+    });
+    ToastAndroid.showWithGravity(
+      `Goal Added! for ${enteredGoalText}`,
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER
+    ); // Uses the Androids Native ToastAndroid Module for Displaying Toasts, and Hence is only Visible in Android
+  };
+
+  const deleteGoalHandler = (id) => {
+    setCourseGoals((prevSnap) => {
+      return prevSnap.filter((goal) => goal.id !== id);
+    });
+    ToastAndroid.showWithGravity(
+      "Goal Removed!!",
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER
+    ); // ToastAndroid Module is Being used to Render Toasts here, Native in Android hence Won't Work in IOS
+  };
 
   return (
-    <View style={styles.appContainer}>
-      <View style={styles.inputContainer}>
-        <TextInput placeholder="Your Course Goal" style={styles.textInput} onChange={(e) => setGoal(e.target.value)} value={goal} />
-        <Button title="Add Goal" onPress={goalSubmitHandler}/>
+    <>
+      <StatusBar style="light" />
+      <View style={styles.appContainer}>
+        {modalIsVisibleState && (
+          <GoalInput
+            onAddGoal={addGoalHandler}
+            visible={modalIsVisibleState}
+            onCancel={endAddGoalHandler}
+          />
+        )}
+        <View style={styles.goalsContainer}>
+          <FlatList
+            data={courseGoals}
+            renderItem={(itemData) => {
+              return (
+                <GoalItem
+                  text={itemData.item.text}
+                  id={itemData.item.id}
+                  onDeleteItem={deleteGoalHandler}
+                />
+              );
+            }}
+            keyExtractor={(item, index) => {
+              return item.id;
+            }}
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <Button
+            title="Add New Goal"
+            color="#a065ec"
+            onPress={startAddGoalHandler}
+          />
+        </View>
       </View>
-      <View>
-        <Text>{goals.map((goal) => {
-          return (
-            <View style={styles.goals} key={goal.id}>
-              <Text style={{marginRight: 5}} >{goal.value}</Text>
-              <Button title="Delete" onPress={() => goalDeleteHandler(goal.id)} />
-            </View>
-          )
-        })}</Text>
-      </View>
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   appContainer: {
+    flex: 1,
     padding: 50,
+    paddingHorizontal: 16,
   },
-  inputContainer: {
-    flexDirection: "row",
-    justifyContent: 'space-between'
+
+  goalsContainer: {
+    flex: 5,
   },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#cccccc',
-    width: '80%',
-    marginRight: 8,
-    marginBottom: 8,
-    padding: 8
+  buttonContainer: {
+    marginTop: 50,
   },
-  goals: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginRight: 10 
-  },
-  container: {
-    flexDirection: "column"
-  }
-  
 });
