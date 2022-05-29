@@ -1,9 +1,12 @@
 import React from "react";
 import { TextInput, View, StyleSheet, Alert } from "react-native";
+import Card from "../Components/UI/Card";
+import InstructionText from "../Components/UI/InstructionText";
 import PrimaryButton from "../Components/UI/PrimaryButton";
+import Title from "../Components/UI/Title";
 import { Colors } from "../utils/colors";
 
-const StartGameScreen = ({onPickNumber}) => {
+const StartGameScreen = ({ onPickNumber }) => {
   const [enteredNumber, setEnteredNumber] = React.useState("");
 
   const confirmInputHandler = () => {
@@ -13,7 +16,7 @@ const StartGameScreen = ({onPickNumber}) => {
       Alert.alert("Invalid Number!", "Number has to be a number b/w 1 & 99", [
         {
           text: "Okay",
-          style: 'destructive',
+          style: "destructive",
           onPress: () => setEnteredNumber(""),
         },
       ]);
@@ -21,30 +24,33 @@ const StartGameScreen = ({onPickNumber}) => {
     }
 
     onPickNumber(choosenNumber);
-
   };
 
   return (
-    <View style={styles.inputContainer}>
-      <TextInput
-        style={styles.numberInput}
-        maxLength={2}
-        keyboardType="number-pad"
-        autoCapitalize="none" // Serves No Purpose Here, But in Handy When We don't want to Auto Capitalize our Values from the Keyboard
-        autoCorrect={false} // Turns off Auto Correction for all Keyboard
-        value={enteredNumber}
-        onChangeText={(enteredText) => setEnteredNumber(enteredText)}
-      />
-      <View style={{ flexDirection: "row" }}>
-        <View style={{ flex: 1 }}>
-          <PrimaryButton onPress={() => setEnteredNumber("")}>
-            Reset
-          </PrimaryButton>
+    <View style={styles.rootContainer}>
+      <Title>Guess My Number</Title>
+      <Card>
+        <InstructionText>Enter a Number</InstructionText> 
+        <TextInput
+          style={styles.numberInput}
+          maxLength={2}
+          keyboardType="number-pad"
+          autoCapitalize="none" // Serves No Purpose Here, But in Handy When We don't want to Auto Capitalize our Values from the Keyboard
+          autoCorrect={false} // Turns off Auto Correction for all Keyboard
+          value={enteredNumber}
+          onChangeText={(enteredText) => setEnteredNumber(enteredText)}
+        />
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ flex: 1 }}>
+            <PrimaryButton onPress={() => setEnteredNumber("")}>
+              Reset
+            </PrimaryButton>
+          </View>
+          <View style={{ flex: 1 }}>
+            <PrimaryButton onPress={confirmInputHandler}>Confirm</PrimaryButton>
+          </View>
         </View>
-        <View style={{ flex: 1 }}>
-          <PrimaryButton onPress={confirmInputHandler}>Confirm</PrimaryButton>
-        </View>
-      </View>
+      </Card>
     </View>
   );
 };
@@ -52,19 +58,10 @@ const StartGameScreen = ({onPickNumber}) => {
 export default StartGameScreen;
 
 const styles = StyleSheet.create({
-  inputContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+  rootContainer: {
+    flex: 1,
     marginTop: 100,
-    marginHorizontal: 24,
-    padding: 16,
-    backgroundColor: Colors.primary800,
-    borderRadius: 8,
-    elevation: 10, // Android Specific Component for Adding Shadwos
-    shadowColor: "black", // iOS Specific Shadow
-    shadowOffset: { width: 0, height: 2 }, // This Adds Shadows to iOS Platform
-    shadowRadius: 6, // iOS Specific Shadow Styling
-    shadowOpacity: 0.25, // iOS Specific Shadow Styling for Opacity
+    alignItems: "center",
   },
 
   numberInput: {
